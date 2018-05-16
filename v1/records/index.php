@@ -1,5 +1,10 @@
 <?php
   
+  if ( $_SERVER[ 'REQUEST_METHOD' ] != "GET" ) {
+    http_response_code( 404 );
+    return;
+  }
+  
   // Headers
   header( 'Content-Type: application/json; charset=UTF-8' );
   
@@ -9,32 +14,22 @@
   $db = new Database();
   $pdo = $db->connect();
   
-  $record = new Record( $pdo );
-  $stmt = $record->getAllRecords();
+  $record_id = isset( $_GET[ 'record_id' ] ) ? $_GET[ 'record_id' ] : null;
+  $record = new Record( $pdo, $record_id );
   
-  // Json structure
-  $records = array();
-  
-  if ( $stmt->rowCount() ) {
+  if ( $record_id ) {
+    // Return single record
     
-    // Fetch assoc array
-    while ( $row = $stmt->fetch( PDO::FETCH_ASSOC ) ) {
-      extract( $row );
-      
-      $record = array(
-        'record_id' => $record_id,
-        'name' => $name,
-        'description' => $description,
-        'price' => $price,
-        'rating' => $rating,
-        'date_created' => $date_created,
-        'date_modified' => $date_modified,
-      );
-      
-      // Push onto product array
-      $records[] = $record;
-    }
+    $record = $record->getRecord();
+    
+    echo json_encode( $record );
+    
+    return;
     
   }
+  
+  // Return all records
+  
+  $records = $record->getAllRecords();
   
   echo json_encode( $records );
