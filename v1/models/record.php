@@ -65,7 +65,6 @@
       
       $stmt = $this->pdo->prepare( $query );
       
-      
       $this->record_id = filter_var( $this->record_id, FILTER_SANITIZE_NUMBER_INT );
       
       $stmt->bindParam( ':record_id', $this->record_id, PDO::PARAM_INT );
@@ -168,14 +167,7 @@
       $this->rating = filter_var( $this->rating, FILTER_SANITIZE_NUMBER_INT );
       $this->date_modified = date( "Y-m-d H:i:s" );
       
-      $record_to_update = $this->getRecord();
-      if ( empty( $record_to_update[ record_id ] ) ) {
-        http_response_code( 400 );
-        return array(
-          'status' => 400,
-          'message' => 'Invalid record.',
-        );
-      }
+      $record_to_update = $this->getRecord(); // Validate record
       
       $stmt->bindParam( ':record_id', $record_to_update[ record_id ] );
       $stmt->bindParam( ':name', $this->name, PDO::PARAM_STR );
@@ -184,13 +176,7 @@
       $stmt->bindParam( ':rating', $this->rating, PDO::PARAM_INT );
       $stmt->bindParam( ':date_modified', $this->date_modified );
       
-      if ( empty( trim( $this->record_id ) ) ) {
-        http_response_code( 400 );
-        return array(
-          'status' => 400,
-          'message' => 'Invalid record.',
-        );
-      } else if ( empty( trim( $this->name ) ) ) {
+      if ( empty( trim( $this->name ) ) ) {
         http_response_code( 400 );
         return array(
           'status' => 400,
@@ -209,6 +195,32 @@
           'date_created' => $record_to_update[ date_created ],
           'date_modified' => $this->date_modified,
         );
+      } catch ( PDOException $exception ) {
+        http_response_code( 500 );
+        return array(
+          'status' => 500,
+          'message' => $exception->getMessage(),
+        );
+      }
+      
+    }
+    
+    public function deleteRecord() {
+      $query = 'DELETE FROM records WHERE record_id LIKE :record_id';
+      
+      $stmt = $this->pdo->prepare( $query );
+      
+      $this->record_id = filter_var( $this->record_id, FILTER_SANITIZE_NUMBER_INT );
+      
+      $record_to_delete = $this->getRecord(); // Validate record
+      
+      $stmt->bindParam( ':record_id', $this->record_id, PDO::PARAM_INT );
+      
+      try {
+        $stmt->execute();
+        
+        return $record_to_delete;
+        
       } catch ( PDOException $exception ) {
         http_response_code( 500 );
         return array(
