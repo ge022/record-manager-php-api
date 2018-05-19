@@ -1,4 +1,6 @@
 <IfModule mod_rewrite.c>
 RewriteEngine on
+#RewriteBase /
+RewriteRule ^v1/records/([0-9]+)$ /v1/records/?record_id=$1 [L]
 RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization},L]
 </IfModule>
