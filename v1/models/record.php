@@ -134,6 +134,13 @@
         );
       }
       
+      // Peg rating to 1-5 range
+      if ($this->rating < 0) {
+        $this->rating = 0;
+      } else if ($this->rating > 5) {
+        $this->rating = 5;
+      }
+      
       $stmt->bindParam( ':name', $this->name, PDO::PARAM_STR );
       $stmt->bindParam( ':description', $this->description, PDO::PARAM_STR );
       $stmt->bindParam( ':price', $this->price, PDO::PARAM_STR );
@@ -178,6 +185,13 @@
       $this->date_modified = date( "Y-m-d H:i:s" );
       
       $record_to_update = $this->getRecord(); // Validate record
+  
+      // Peg rating to 1-5 range
+      if ($this->rating < 0) {
+        $this->rating = 0;
+      } else if ($this->rating > 5) {
+        $this->rating = 5;
+      }
       
       $stmt->bindParam( ':record_id', $record_to_update[ record_id ] );
       $stmt->bindParam( ':name', $this->name, PDO::PARAM_STR );
