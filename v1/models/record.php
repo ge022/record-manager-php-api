@@ -1,4 +1,7 @@
 <?php
+  if (getcwd() == dirname(__FILE__)) {
+    die();
+  }
   
   class Record {
     
@@ -10,6 +13,7 @@
     public $description;
     public $price;
     public $rating;
+    public $image;
     public $date_created;
     public $date_modified;
     
@@ -38,6 +42,7 @@
               'description' => htmlspecialchars_decode( $row[ description ], ENT_QUOTES ),
               'price' => $row[ price ],
               'rating' => $row[ rating ],
+              'image' => $row[ image ],
               'date_created' => $row[ date_created ],
               'date_modified' => $row[ date_modified ],
             );
@@ -83,6 +88,7 @@
             'description' => htmlspecialchars_decode( $record[ description ], ENT_QUOTES ),
             'price' => $record[ price ],
             'rating' => $record[ rating ],
+            'image' => $record[ image ],
             'date_created' => $record[ date_created ],
             'date_modified' => $record[ date_modified ],
           );
@@ -108,7 +114,7 @@
     }
     
     public function createRecord() {
-      $query = 'INSERT INTO records (name, description, price, rating, date_created, date_modified) VALUES (:name, :description, :price, :rating, :date_created, :date_modified)';
+      $query = 'INSERT INTO records (name, description, price, rating, image, date_created, date_modified) VALUES (:name, :description, :price, :rating, :image, :date_created, :date_modified)';
       
       $stmt = $this->pdo->prepare( $query );
       
@@ -116,6 +122,7 @@
       $this->description = filter_var( $this->description, FILTER_SANITIZE_FULL_SPECIAL_CHARS );
       $this->price = filter_var( $this->price, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION );
       $this->rating = filter_var( $this->rating, FILTER_SANITIZE_NUMBER_INT );
+      $this->image = filter_var( $this->image, FILTER_SANITIZE_URL );
       $this->date_created = date( "Y-m-d H:i:s" );
       $this->date_modified = date( "Y-m-d H:i:s" );
       
@@ -131,6 +138,7 @@
       $stmt->bindParam( ':description', $this->description, PDO::PARAM_STR );
       $stmt->bindParam( ':price', $this->price, PDO::PARAM_STR );
       $stmt->bindParam( ':rating', $this->rating, PDO::PARAM_INT );
+      $stmt->bindParam( ':image', $this->image, PDO::PARAM_STR );
       $stmt->bindParam( ':date_created', $this->date_created );
       $stmt->bindParam( ':date_modified', $this->date_modified );
       
@@ -142,6 +150,7 @@
           'description' => htmlspecialchars_decode( $this->description, ENT_QUOTES ),
           'price' => $this->price,
           'rating' => $this->rating,
+          'image' => $this->image,
           'date_created' => $this->date_created,
           'date_modified' => $this->date_modified,
         );
@@ -156,7 +165,7 @@
     }
     
     public function updateRecord() {
-      $query = 'UPDATE records SET name = :name, description = :description, price = :price, rating = :rating, date_modified = :date_modified WHERE record_id LIKE :record_id';
+      $query = 'UPDATE records SET name = :name, description = :description, price = :price, rating = :rating, image = :image, date_modified = :date_modified WHERE record_id LIKE :record_id';
       
       $stmt = $this->pdo->prepare( $query );
       
@@ -165,6 +174,7 @@
       $this->description = filter_var( $this->description, FILTER_SANITIZE_FULL_SPECIAL_CHARS );
       $this->price = filter_var( $this->price, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION );
       $this->rating = filter_var( $this->rating, FILTER_SANITIZE_NUMBER_INT );
+      $this->image = filter_var( $this->image, FILTER_SANITIZE_URL );
       $this->date_modified = date( "Y-m-d H:i:s" );
       
       $record_to_update = $this->getRecord(); // Validate record
@@ -174,6 +184,7 @@
       $stmt->bindParam( ':description', $this->description, PDO::PARAM_STR );
       $stmt->bindParam( ':price', $this->price, PDO::PARAM_STR );
       $stmt->bindParam( ':rating', $this->rating, PDO::PARAM_INT );
+      $stmt->bindParam( ':image', $this->image, PDO::PARAM_STR );
       $stmt->bindParam( ':date_modified', $this->date_modified );
       
       if ( empty( trim( $this->name ) ) ) {
@@ -192,6 +203,7 @@
           'description' => htmlspecialchars_decode( $this->description, ENT_QUOTES ),
           'price' => $this->price,
           'rating' => $this->rating,
+          'image' => $this->image,
           'date_created' => $record_to_update[ date_created ],
           'date_modified' => $this->date_modified,
         );

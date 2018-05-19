@@ -6,6 +6,7 @@
   $request_method = $_SERVER[ 'REQUEST_METHOD' ];
   
   include_once( '../../config/database.php' );
+  require( '../../config/auth.php' );
   include_once( '../models/record.php' );
   
   $db = new Database();
@@ -30,7 +31,8 @@
         $record->description = $data->description;
         $record->price = $data->price;
         $record->rating = $data->rating;
-        
+        $record->image = $data->image;
+  
         $record = $record->updateRecord();
         echo json_encode( $record );
         return;
@@ -64,6 +66,7 @@
       $record->description = $data->description;
       $record->price = $data->price;
       $record->rating = $data->rating;
+      $record->image = $data->image;
       
       $record = $record->createRecord();
       echo json_encode( $record );
@@ -73,5 +76,5 @@
       
       $records = $record->getAllRecords();
       echo json_encode( $records );
-      
+    
   }
