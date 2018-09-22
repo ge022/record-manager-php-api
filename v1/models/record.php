@@ -66,7 +66,7 @@
     }
     
     public function getRecord() {
-      $query = 'SELECT * FROM records WHERE record_id LIKE :record_id';
+      $query = 'SELECT * FROM records WHERE record_id = :record_id';
       
       $stmt = $this->pdo->prepare( $query );
       
@@ -95,13 +95,14 @@
           
           return $record;
           
-        } else {
-          http_response_code( 400 );
-          return array(
-            'status' => 400,
-            'message' => 'Invalid record.',
-          );
         }
+        
+        http_response_code( 400 );
+        return array(
+        'status' => 400,
+        'message' => 'Invalid record.',
+        );
+        
         
       } catch ( PDOException $exception ) {
         http_response_code( 500 );
@@ -172,7 +173,7 @@
     }
     
     public function updateRecord() {
-      $query = 'UPDATE records SET name = :name, description = :description, price = :price, rating = :rating, image = :image, date_modified = :date_modified WHERE record_id LIKE :record_id';
+      $query = 'UPDATE records SET name = :name, description = :description, price = :price, rating = :rating, image = :image, date_modified = :date_modified WHERE record_id = :record_id';
       
       $stmt = $this->pdo->prepare( $query );
       
@@ -232,7 +233,7 @@
     }
     
     public function deleteRecord() {
-      $query = 'DELETE FROM records WHERE record_id LIKE :record_id';
+      $query = 'DELETE FROM records WHERE record_id = :record_id';
       
       $stmt = $this->pdo->prepare( $query );
       
